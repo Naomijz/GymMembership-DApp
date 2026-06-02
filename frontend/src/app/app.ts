@@ -171,7 +171,7 @@ showAdmin() {
 
 }
 
-loginAdmin() {
+async loginAdmin() {
 
   if (
     this.adminUser === 'admin' &&
