@@ -1,0 +1,252 @@
+<div *ngIf="currentView === ''" class="home">
+
+  <h1>🚀 ChainPass Membership</h1>
+
+  <h2>Sistema de Membresías NFT</h2>
+
+  <button (click)="showClient()">
+    👤 Entrar como Cliente
+  </button>
+
+  <br><br>
+
+  <button (click)="showAdmin()">
+    ⚙️ Entrar como Administrador
+  </button>
+
+</div>
+
+<!-- ========================= -->
+<!-- ADMINISTRADOR -->
+<!-- ========================= -->
+
+<div *ngIf="currentView === 'admin'">
+
+  <!-- LOGIN -->
+
+  <div *ngIf="!adminLogged">
+
+    <h1>🔐 Login Administrador</h1>
+
+    <input
+      type="text"
+      placeholder="Usuario"
+      [(ngModel)]="adminUser"
+    >
+
+    <br><br>
+
+    <input
+      type="password"
+      placeholder="Contraseña"
+      [(ngModel)]="adminPassword"
+    >
+
+    <br><br>
+
+    <button (click)="loginAdmin()">
+      Iniciar Sesión
+    </button>
+
+    <br><br>
+
+    <button (click)="currentView=''">
+      ⬅ Volver
+    </button>
+
+  </div>
+
+  <!-- DASHBOARD -->
+<button (click)="currentView=''">
+  🏠 Inicio
+</button>
+
+<button (click)="adminLogged=false">
+  🚪 Cerrar Sesión
+</button>
+
+<hr>
+  <div *ngIf="adminLogged">
+
+    <h1>⚙️ Panel Administrador</h1>
+
+    <p>
+      Bienvenido Administrador
+    </p>
+<button (click)="connectWallet()">
+  🔗 Conectar MetaMask
+</button>
+
+<p *ngIf="walletAddress">
+  Wallet: {{ walletAddress }}
+</p>
+
+<hr>
+
+    <hr>
+
+    <h2>💰 Finanzas</h2>
+
+    <p>
+      Balance del contrato:
+      {{ contractBalance }}
+      Wei
+    </p>
+
+    <button (click)="withdrawFunds()">
+      Retirar Fondos
+    </button>
+
+    <hr>
+
+    <h2>➕ Crear Nuevo Plan</h2>
+
+    <input
+      type="text"
+      placeholder="Nombre del Plan"
+      [(ngModel)]="newPlanName"
+    >
+
+    <br><br>
+
+    <input
+      type="number"
+      placeholder="Duración en días"
+      [(ngModel)]="newPlanDuration"
+    >
+
+    <br><br>
+
+    <input
+      type="text"
+      placeholder="Precio en Wei"
+      [(ngModel)]="newPlanPrice"
+    >
+
+    <br><br>
+
+    <button (click)="createPlan()">
+      Crear Plan
+    </button>
+
+    <hr>
+
+    <h2>📋 Planes Existentes</h2>
+
+    <div *ngFor="let plan of plans">
+
+      <h3>{{ plan.name }}</h3>
+
+      <p>
+        Duración:
+        {{ plan.durationDays }} días
+      </p>
+
+      <p>
+        Precio:
+        {{ plan.price }} Wei
+      </p>
+
+      <hr>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ========================= -->
+<!-- CLIENTE -->
+<!-- ========================= -->
+
+<div *ngIf="currentView === 'client'">
+
+  <h1>👤 Área de Cliente</h1>
+
+  <button (click)="connectWallet()">
+    Conectar MetaMask
+  </button>
+
+  <br><br>
+
+  <button (click)="currentView=''">
+    ⬅ Volver
+  </button>
+
+  <div *ngIf="walletAddress">
+
+    <hr>
+
+    <p>
+      <strong>Wallet:</strong>
+      {{ walletAddress }}
+    </p>
+
+    <hr>
+
+    <h2>🏋️ Planes Disponibles</h2>
+
+    <div *ngFor="let plan of plans">
+
+      <h3>{{ plan.name }}</h3>
+
+      <p>
+        Duración:
+        {{ plan.durationDays }}
+        días
+      </p>
+
+      <p>
+        Precio:
+        {{ plan.price }}
+        Wei
+      </p>
+
+      <button
+        (click)="buyPlan(plan)"
+      >
+        Comprar Membresía
+      </button>
+
+      <hr>
+
+    </div>
+
+    <h2>🎫 Mis Membresías</h2>
+
+    <div *ngIf="memberships.length === 0">
+
+      <p>
+        No tienes membresías registradas.
+      </p>
+
+    </div>
+
+    <div *ngFor="let m of memberships">
+
+      <p>
+        NFT #{{ m.tokenId }}
+      </p>
+
+      <p>
+        Plan ID:
+        {{ m.planId }}
+      </p>
+
+      <p>
+        Estado:
+        {{ m.valid ? '✅ Activa' : '❌ Vencida' }}
+      </p>
+
+      <p>
+        Expira:
+        {{ m.endDate * 1000 | date:'medium' }}
+      </p>
+
+      <hr>
+
+    </div>
+
+  </div>
+
+</div>
