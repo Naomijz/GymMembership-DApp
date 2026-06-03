@@ -215,7 +215,7 @@ decodeFunctionResult(functionFragment: 'withdraw', data: BytesLike): Result;
 
     
     extendMembership: TypedContractMethod<
-      [tokenId: BigNumberish, extraDays: BigNumberish, ],
+      [originalTokenId: BigNumberish, extraDays: BigNumberish, ],
       [void],
       'nonpayable'
     >
@@ -444,7 +444,7 @@ getFunction(nameOrSignature: 'deactivatePlan'): TypedContractMethod<
       'nonpayable'
     >;
 getFunction(nameOrSignature: 'extendMembership'): TypedContractMethod<
-      [tokenId: BigNumberish, extraDays: BigNumberish, ],
+      [originalTokenId: BigNumberish, extraDays: BigNumberish, ],
       [void],
       'nonpayable'
     >;

@@ -51,7 +51,7 @@ contract MembershipNFT is ERC721, Ownable {
     nextPlanId++;
 }
 
-    function createPlan(
+function createPlan(
     string memory _name,
     uint256 _durationDays,
     uint256 _price
@@ -67,7 +67,7 @@ contract MembershipNFT is ERC721, Ownable {
     nextPlanId++;
 }
 
-    function buyMembership(uint256 _planId) public payable {
+function buyMembership(uint256 _planId) public payable {
 
     Plan memory selectedPlan = plans[_planId];
 
@@ -195,15 +195,36 @@ function cancelMembership(
         block.timestamp;
 }
 
+// Al ampliar se mintea un NFT nuevo con nueva vigencia
+// que comienza donde termina el anterior
 function extendMembership(
-    uint256 tokenId,
+    uint256 originalTokenId,
     uint256 extraDays
 )
     public
     onlyOwner
 {
-    memberships[tokenId].endDate +=
-        extraDays * 1 days;
+    Membership memory original =
+        memberships[originalTokenId];
+
+    address memberOwner =
+        ownerOf(originalTokenId);
+
+    uint256 newTokenId = nextTokenId;
+
+    _safeMint(memberOwner, newTokenId);
+
+    // La nueva vigencia empieza donde termina la anterior
+    uint256 newStart = original.endDate;
+    uint256 newEnd = newStart + (extraDays * 1 days);
+
+    memberships[newTokenId] = Membership({
+        planId: original.planId,
+        startDate: newStart,
+        endDate: newEnd
+    });
+
+    nextTokenId++;
 }
 
 function getTotalMemberships()
