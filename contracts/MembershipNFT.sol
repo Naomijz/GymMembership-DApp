@@ -234,4 +234,20 @@ function getTotalMemberships()
 {
     return nextTokenId;
 }
+function editPlan(
+    uint256 planId,
+    string memory _name,
+    uint256 _durationDays,
+    uint256 _price
+) public onlyOwner {
+    plans[planId].name = _name;
+    plans[planId].durationDays = _durationDays;
+    plans[planId].price = _price;
+}
+
+function deletePlan(
+    uint256 planId
+) public onlyOwner {
+    delete plans[planId];
+}
 }

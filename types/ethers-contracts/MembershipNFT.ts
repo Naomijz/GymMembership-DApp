@@ -6,7 +6,7 @@ import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, Typed
   
 
   export interface MembershipNFTInterface extends Interface {
-    getFunction(nameOrSignature: "activatePlan" | "approve" | "balanceOf" | "buyMembership" | "cancelMembership" | "createPlan" | "deactivatePlan" | "extendMembership" | "getApproved" | "getContractBalance" | "getMembership" | "getMyMemberships" | "getTotalMemberships" | "isApprovedForAll" | "isMembershipValid" | "memberships" | "name" | "nextPlanId" | "owner" | "ownerOf" | "plans" | "renounceOwnership" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "setApprovalForAll" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "transferOwnership" | "withdraw"): FunctionFragment;
+    getFunction(nameOrSignature: "activatePlan" | "approve" | "balanceOf" | "buyMembership" | "cancelMembership" | "createPlan" | "deactivatePlan" | "deletePlan" | "editPlan" | "extendMembership" | "getApproved" | "getContractBalance" | "getMembership" | "getMyMemberships" | "getTotalMemberships" | "isApprovedForAll" | "isMembershipValid" | "memberships" | "name" | "nextPlanId" | "owner" | "ownerOf" | "plans" | "renounceOwnership" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "setApprovalForAll" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "transferOwnership" | "withdraw"): FunctionFragment;
 
     getEvent(nameOrSignatureOrTopic: "Approval" | "ApprovalForAll" | "OwnershipTransferred" | "Transfer"): EventFragment;
 
@@ -17,6 +17,8 @@ encodeFunctionData(functionFragment: 'buyMembership', values: [BigNumberish]): s
 encodeFunctionData(functionFragment: 'cancelMembership', values: [BigNumberish]): string;
 encodeFunctionData(functionFragment: 'createPlan', values: [string, BigNumberish, BigNumberish]): string;
 encodeFunctionData(functionFragment: 'deactivatePlan', values: [BigNumberish]): string;
+encodeFunctionData(functionFragment: 'deletePlan', values: [BigNumberish]): string;
+encodeFunctionData(functionFragment: 'editPlan', values: [BigNumberish, string, BigNumberish, BigNumberish]): string;
 encodeFunctionData(functionFragment: 'extendMembership', values: [BigNumberish, BigNumberish]): string;
 encodeFunctionData(functionFragment: 'getApproved', values: [BigNumberish]): string;
 encodeFunctionData(functionFragment: 'getContractBalance', values?: undefined): string;
@@ -49,6 +51,8 @@ decodeFunctionResult(functionFragment: 'buyMembership', data: BytesLike): Result
 decodeFunctionResult(functionFragment: 'cancelMembership', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'createPlan', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'deactivatePlan', data: BytesLike): Result;
+decodeFunctionResult(functionFragment: 'deletePlan', data: BytesLike): Result;
+decodeFunctionResult(functionFragment: 'editPlan', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'extendMembership', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'getApproved', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'getContractBalance', data: BytesLike): Result;
@@ -208,6 +212,22 @@ decodeFunctionResult(functionFragment: 'withdraw', data: BytesLike): Result;
     
     deactivatePlan: TypedContractMethod<
       [planId: BigNumberish, ],
+      [void],
+      'nonpayable'
+    >
+    
+
+    
+    deletePlan: TypedContractMethod<
+      [planId: BigNumberish, ],
+      [void],
+      'nonpayable'
+    >
+    
+
+    
+    editPlan: TypedContractMethod<
+      [planId: BigNumberish, _name: string, _durationDays: BigNumberish, _price: BigNumberish, ],
       [void],
       'nonpayable'
     >
@@ -440,6 +460,16 @@ getFunction(nameOrSignature: 'createPlan'): TypedContractMethod<
     >;
 getFunction(nameOrSignature: 'deactivatePlan'): TypedContractMethod<
       [planId: BigNumberish, ],
+      [void],
+      'nonpayable'
+    >;
+getFunction(nameOrSignature: 'deletePlan'): TypedContractMethod<
+      [planId: BigNumberish, ],
+      [void],
+      'nonpayable'
+    >;
+getFunction(nameOrSignature: 'editPlan'): TypedContractMethod<
+      [planId: BigNumberish, _name: string, _durationDays: BigNumberish, _price: BigNumberish, ],
       [void],
       'nonpayable'
     >;
