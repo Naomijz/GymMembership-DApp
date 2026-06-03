@@ -11,8 +11,8 @@
   --accent3: #10b981;
   --danger: #ef4444;
   --warning: #f59e0b;
-  --text: #e2e8f0;
-  --text2: #94a3b8;
+  --text: #517099;
+  --text2: #657996;
   --text3: #64748b;
 }
 
@@ -25,7 +25,7 @@
 body {
   background: #0a0e1a;
   font-family: 'Inter', sans-serif;
-  color: #e2e8f0;
+  color: #295287;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -83,7 +83,7 @@ h3 {
   font-family: 'Rajdhani', sans-serif;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #3c5d88;
   letter-spacing: 1px;
 }
 
@@ -165,7 +165,7 @@ button, .btn {
 
 .btn-purple {
   background: linear-gradient(135deg, var(--accent2), #5b21b6);
-  color: white;
+  color: rgb(178, 49, 187);
 }
 
 .btn-purple:hover {
@@ -175,7 +175,7 @@ button, .btn {
 
 .btn-success {
   background: linear-gradient(135deg, var(--accent3), #059669);
-  color: white;
+  color: rgb(19, 3, 8);
 }
 
 .btn-success:hover {

@@ -207,5 +207,44 @@ async getTotalMemberships() {
   return await this.contract
     .getTotalMemberships();
 }
+async deactivatePlan(
+  planId: number
+) {
 
+  const tx =
+    await this.contract
+      .deactivatePlan(planId);
+
+  await tx.wait();
+}
+
+async activatePlan(
+  planId: number
+) {
+
+  const tx =
+    await this.contract
+      .activatePlan(planId);
+
+  await tx.wait();
+}
+
+async updatePlan(
+  planId: number,
+  name: string,
+  duration: number,
+  price: string
+) {
+
+  const tx =
+    await this.contract
+      .updatePlan(
+        planId,
+        name,
+        duration,
+        price
+      );
+
+  await tx.wait();
+}
 }
