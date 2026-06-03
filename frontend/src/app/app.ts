@@ -20,7 +20,7 @@ export class App {
   memberships: any[] = [];
   allMemberships: any[] = [];
 
-extendDays = 30;
+  extendDays = 30;
 
   isAdmin = false;
   contractBalance = '0';
@@ -31,10 +31,8 @@ extendDays = 30;
 
   currentView = '';
 
-adminUser = '';
-adminPassword = '';
-
-adminLogged = false;
+  adminLogged = false;
+  adminError = '';
 
   constructor(
     private blockchainService: BlockchainService
@@ -55,7 +53,6 @@ adminLogged = false;
 
       this.isAdmin =
         await this.blockchainService.isOwner();
-        console.log("Es admin:", this.isAdmin);
 
       const balance =
         await this.blockchainService.getContractBalance();
@@ -88,9 +85,7 @@ adminLogged = false;
       this.contractBalance =
         balance.toString();
 
-      alert(
-        'Membresía comprada correctamente'
-      );
+      alert('Membresía comprada correctamente');
 
     } catch (error) {
 
@@ -111,9 +106,7 @@ adminLogged = false;
       this.contractBalance =
         balance.toString();
 
-      alert(
-        'Fondos retirados correctamente'
-      );
+      alert('Fondos retirados correctamente');
 
     } catch (error) {
 
@@ -124,164 +117,164 @@ adminLogged = false;
 
   async createPlan() {
 
-  if (!this.blockchainService.contract) {
-
-    alert(
-      'Primero conecta MetaMask'
-    );
-
-    return;
-  }
-
-  try {
-
-    await this.blockchainService.createPlan(
-      this.newPlanName,
-      this.newPlanDuration,
-      this.newPlanPrice
-    );
-
-    this.plans =
-      await this.blockchainService.getPlans();
-
-    this.newPlanName = '';
-    this.newPlanDuration = 30;
-    this.newPlanPrice = '';
-
-    alert(
-      'Plan creado correctamente'
-    );
-
-  } catch(error) {
-
-    console.error(error);
-
-  }
-
-}
-  showClient() {
-
-  this.currentView = 'client';
-
-}
-
-showAdmin() {
-
-  this.currentView = 'admin';
-
-}
-
-async loginAdmin() {
-
-  if (
-    this.adminUser === 'admin' &&
-    this.adminPassword === 'admin123'
-  ) {
-
-    this.adminLogged = true;
-    await this.loadAllMemberships();
-
-    alert(
-      'Bienvenido Administrador'
-    );
-
-  } else {
-
-    alert(
-      'Usuario o contraseña incorrectos'
-    );
-
-  }
-
-}
-async loadAllMemberships() {
-
-  try {
-
-    const total =
-      await this.blockchainService
-        .getTotalMemberships();
-
-    this.allMemberships = [];
-
-    for (
-      let i = 0;
-      i < Number(total);
-      i++
-    ) {
-
-      const membership =
-        await this.blockchainService
-          .contract
-          .getMembership(i);
-
-      const valid =
-        await this.blockchainService
-          .contract
-          .isMembershipValid(i);
-
-      this.allMemberships.push({
-        tokenId: i,
-        planId: Number(membership[0]),
-        startDate: Number(membership[1]),
-        endDate: Number(membership[2]),
-        valid
-      });
-
+    if (!this.blockchainService.contract) {
+      alert('Primero conecta MetaMask');
+      return;
     }
 
-  } catch(error) {
+    try {
 
-    console.error(error);
-
-  }
-}
-
-async cancelMembership(
-  tokenId: number
-) {
-
-  try {
-
-    await this.blockchainService
-      .cancelMembership(tokenId);
-
-    await this.loadAllMemberships();
-
-    alert(
-      'Membresía cancelada'
-    );
-
-  } catch(error) {
-
-    console.error(error);
-
-  }
-}
-
-async extendMembership(
-  tokenId: number
-) {
-
-  try {
-
-    await this.blockchainService
-      .extendMembership(
-        tokenId,
-        this.extendDays
+      await this.blockchainService.createPlan(
+        this.newPlanName,
+        this.newPlanDuration,
+        this.newPlanPrice
       );
 
-    await this.loadAllMemberships();
+      this.plans =
+        await this.blockchainService.getPlans();
 
-    alert(
-      'Membresía extendida'
-    );
+      this.newPlanName = '';
+      this.newPlanDuration = 30;
+      this.newPlanPrice = '';
 
-  } catch(error) {
+      alert('Plan creado correctamente');
 
-    console.error(error);
+    } catch (error) {
 
+      console.error(error);
+
+    }
   }
-}
 
+  showClient() {
+    this.currentView = 'client';
+  }
+
+  showAdmin() {
+    this.currentView = 'admin';
+    this.adminError = '';
+  }
+
+  // Admin se autentica solo con su wallet — no hay usuario/contraseña
+  async loginAdmin() {
+
+    try {
+
+      this.adminError = '';
+
+      this.walletAddress =
+        await this.blockchainService.connectWallet();
+
+      this.isAdmin =
+        await this.blockchainService.isOwner();
+
+      if (!this.isAdmin) {
+        this.adminError =
+          'Esta wallet no es la propietaria del contrato.';
+        return;
+      }
+
+      this.plans =
+        await this.blockchainService.getPlans();
+
+      const balance =
+        await this.blockchainService.getContractBalance();
+
+      this.contractBalance =
+        balance.toString();
+
+      this.adminLogged = true;
+
+      await this.loadAllMemberships();
+
+    } catch (error) {
+
+      console.error(error);
+      this.adminError =
+        'Error al conectar MetaMask. Intenta de nuevo.';
+
+    }
+  }
+
+  async loadAllMemberships() {
+
+    try {
+
+      const total =
+        await this.blockchainService
+          .getTotalMemberships();
+
+      this.allMemberships = [];
+
+      for (
+        let i = 0;
+        i < Number(total);
+        i++
+      ) {
+
+        const membership =
+          await this.blockchainService
+            .contract
+            .getMembership(i);
+
+        const valid =
+          await this.blockchainService
+            .contract
+            .isMembershipValid(i);
+
+        this.allMemberships.push({
+          tokenId: i,
+          planId: Number(membership[0]),
+          startDate: Number(membership[1]),
+          endDate: Number(membership[2]),
+          valid
+        });
+
+      }
+
+    } catch (error) {
+
+      console.error(error);
+
+    }
+  }
+
+  async cancelMembership(tokenId: number) {
+
+    try {
+
+      await this.blockchainService
+        .cancelMembership(tokenId);
+
+      await this.loadAllMemberships();
+
+      alert('Membresía cancelada');
+
+    } catch (error) {
+
+      console.error(error);
+
+    }
+  }
+
+  async extendMembership(tokenId: number) {
+
+    try {
+
+      await this.blockchainService
+        .extendMembership(
+          tokenId,
+          this.extendDays
+        );
+
+      await this.loadAllMemberships();
+
+      alert('Membresía extendida');
+
+    } catch (error) {
+
+      console.error(error);
+
+    }
+  }
 }

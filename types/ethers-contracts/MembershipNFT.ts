@@ -6,17 +6,23 @@ import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, Typed
   
 
   export interface MembershipNFTInterface extends Interface {
-    getFunction(nameOrSignature: "approve" | "balanceOf" | "buyMembership" | "createPlan" | "getApproved" | "getMembership" | "getMyMemberships" | "isApprovedForAll" | "isMembershipValid" | "memberships" | "name" | "nextPlanId" | "owner" | "ownerOf" | "plans" | "renounceOwnership" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "setApprovalForAll" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "transferOwnership" | "withdraw"): FunctionFragment;
+    getFunction(nameOrSignature: "activatePlan" | "approve" | "balanceOf" | "buyMembership" | "cancelMembership" | "createPlan" | "deactivatePlan" | "extendMembership" | "getApproved" | "getContractBalance" | "getMembership" | "getMyMemberships" | "getTotalMemberships" | "isApprovedForAll" | "isMembershipValid" | "memberships" | "name" | "nextPlanId" | "owner" | "ownerOf" | "plans" | "renounceOwnership" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "setApprovalForAll" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "transferOwnership" | "withdraw"): FunctionFragment;
 
     getEvent(nameOrSignatureOrTopic: "Approval" | "ApprovalForAll" | "OwnershipTransferred" | "Transfer"): EventFragment;
 
-    encodeFunctionData(functionFragment: 'approve', values: [AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: 'activatePlan', values: [BigNumberish]): string;
+encodeFunctionData(functionFragment: 'approve', values: [AddressLike, BigNumberish]): string;
 encodeFunctionData(functionFragment: 'balanceOf', values: [AddressLike]): string;
 encodeFunctionData(functionFragment: 'buyMembership', values: [BigNumberish]): string;
+encodeFunctionData(functionFragment: 'cancelMembership', values: [BigNumberish]): string;
 encodeFunctionData(functionFragment: 'createPlan', values: [string, BigNumberish, BigNumberish]): string;
+encodeFunctionData(functionFragment: 'deactivatePlan', values: [BigNumberish]): string;
+encodeFunctionData(functionFragment: 'extendMembership', values: [BigNumberish, BigNumberish]): string;
 encodeFunctionData(functionFragment: 'getApproved', values: [BigNumberish]): string;
+encodeFunctionData(functionFragment: 'getContractBalance', values?: undefined): string;
 encodeFunctionData(functionFragment: 'getMembership', values: [BigNumberish]): string;
 encodeFunctionData(functionFragment: 'getMyMemberships', values?: undefined): string;
+encodeFunctionData(functionFragment: 'getTotalMemberships', values?: undefined): string;
 encodeFunctionData(functionFragment: 'isApprovedForAll', values: [AddressLike, AddressLike]): string;
 encodeFunctionData(functionFragment: 'isMembershipValid', values: [BigNumberish]): string;
 encodeFunctionData(functionFragment: 'memberships', values: [BigNumberish]): string;
@@ -36,13 +42,19 @@ encodeFunctionData(functionFragment: 'transferFrom', values: [AddressLike, Addre
 encodeFunctionData(functionFragment: 'transferOwnership', values: [AddressLike]): string;
 encodeFunctionData(functionFragment: 'withdraw', values?: undefined): string;
 
-    decodeFunctionResult(functionFragment: 'approve', data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: 'activatePlan', data: BytesLike): Result;
+decodeFunctionResult(functionFragment: 'approve', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'balanceOf', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'buyMembership', data: BytesLike): Result;
+decodeFunctionResult(functionFragment: 'cancelMembership', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'createPlan', data: BytesLike): Result;
+decodeFunctionResult(functionFragment: 'deactivatePlan', data: BytesLike): Result;
+decodeFunctionResult(functionFragment: 'extendMembership', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'getApproved', data: BytesLike): Result;
+decodeFunctionResult(functionFragment: 'getContractBalance', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'getMembership', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'getMyMemberships', data: BytesLike): Result;
+decodeFunctionResult(functionFragment: 'getTotalMemberships', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'isApprovedForAll', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'isMembershipValid', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'memberships', data: BytesLike): Result;
@@ -146,6 +158,14 @@ decodeFunctionResult(functionFragment: 'withdraw', data: BytesLike): Result;
 
     
     
+    activatePlan: TypedContractMethod<
+      [planId: BigNumberish, ],
+      [void],
+      'nonpayable'
+    >
+    
+
+    
     approve: TypedContractMethod<
       [to: AddressLike, tokenId: BigNumberish, ],
       [void],
@@ -170,8 +190,32 @@ decodeFunctionResult(functionFragment: 'withdraw', data: BytesLike): Result;
     
 
     
+    cancelMembership: TypedContractMethod<
+      [tokenId: BigNumberish, ],
+      [void],
+      'nonpayable'
+    >
+    
+
+    
     createPlan: TypedContractMethod<
       [_name: string, _durationDays: BigNumberish, _price: BigNumberish, ],
+      [void],
+      'nonpayable'
+    >
+    
+
+    
+    deactivatePlan: TypedContractMethod<
+      [planId: BigNumberish, ],
+      [void],
+      'nonpayable'
+    >
+    
+
+    
+    extendMembership: TypedContractMethod<
+      [tokenId: BigNumberish, extraDays: BigNumberish, ],
       [void],
       'nonpayable'
     >
@@ -181,6 +225,14 @@ decodeFunctionResult(functionFragment: 'withdraw', data: BytesLike): Result;
     getApproved: TypedContractMethod<
       [tokenId: BigNumberish, ],
       [string],
+      'view'
+    >
+    
+
+    
+    getContractBalance: TypedContractMethod<
+      [],
+      [bigint],
       'view'
     >
     
@@ -197,6 +249,14 @@ decodeFunctionResult(functionFragment: 'withdraw', data: BytesLike): Result;
     getMyMemberships: TypedContractMethod<
       [],
       [bigint[]],
+      'view'
+    >
+    
+
+    
+    getTotalMemberships: TypedContractMethod<
+      [],
+      [bigint],
       'view'
     >
     
@@ -348,7 +408,12 @@ decodeFunctionResult(functionFragment: 'withdraw', data: BytesLike): Result;
 
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
 
-    getFunction(nameOrSignature: 'approve'): TypedContractMethod<
+    getFunction(nameOrSignature: 'activatePlan'): TypedContractMethod<
+      [planId: BigNumberish, ],
+      [void],
+      'nonpayable'
+    >;
+getFunction(nameOrSignature: 'approve'): TypedContractMethod<
       [to: AddressLike, tokenId: BigNumberish, ],
       [void],
       'nonpayable'
@@ -363,14 +428,34 @@ getFunction(nameOrSignature: 'buyMembership'): TypedContractMethod<
       [void],
       'payable'
     >;
+getFunction(nameOrSignature: 'cancelMembership'): TypedContractMethod<
+      [tokenId: BigNumberish, ],
+      [void],
+      'nonpayable'
+    >;
 getFunction(nameOrSignature: 'createPlan'): TypedContractMethod<
       [_name: string, _durationDays: BigNumberish, _price: BigNumberish, ],
+      [void],
+      'nonpayable'
+    >;
+getFunction(nameOrSignature: 'deactivatePlan'): TypedContractMethod<
+      [planId: BigNumberish, ],
+      [void],
+      'nonpayable'
+    >;
+getFunction(nameOrSignature: 'extendMembership'): TypedContractMethod<
+      [tokenId: BigNumberish, extraDays: BigNumberish, ],
       [void],
       'nonpayable'
     >;
 getFunction(nameOrSignature: 'getApproved'): TypedContractMethod<
       [tokenId: BigNumberish, ],
       [string],
+      'view'
+    >;
+getFunction(nameOrSignature: 'getContractBalance'): TypedContractMethod<
+      [],
+      [bigint],
       'view'
     >;
 getFunction(nameOrSignature: 'getMembership'): TypedContractMethod<
@@ -381,6 +466,11 @@ getFunction(nameOrSignature: 'getMembership'): TypedContractMethod<
 getFunction(nameOrSignature: 'getMyMemberships'): TypedContractMethod<
       [],
       [bigint[]],
+      'view'
+    >;
+getFunction(nameOrSignature: 'getTotalMemberships'): TypedContractMethod<
+      [],
+      [bigint],
       'view'
     >;
 getFunction(nameOrSignature: 'isApprovedForAll'): TypedContractMethod<

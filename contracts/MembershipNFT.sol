@@ -30,19 +30,21 @@ contract MembershipNFT is ERC721, Ownable {
     ERC721("ChainPass Membership", "CPM")
     Ownable(msg.sender)
 {
+    // 0.0001 ETH = 100000000000000 Wei (muy barato para pruebas)
     plans[nextPlanId] = Plan({
         name: "Basico",
         durationDays: 30,
-        price: 10000000000000000,
+        price: 100000000000000,
         active: true
     });
 
     nextPlanId++;
 
+    // 0.0003 ETH = 300000000000000 Wei
     plans[nextPlanId] = Plan({
         name: "Premium",
         durationDays: 90,
-        price: 25000000000000000,
+        price: 300000000000000,
         active: true
     });
 
@@ -53,7 +55,7 @@ contract MembershipNFT is ERC721, Ownable {
     string memory _name,
     uint256 _durationDays,
     uint256 _price
-) public {
+) public onlyOwner {
 
     plans[nextPlanId] = Plan({
         name: _name,
@@ -88,6 +90,7 @@ contract MembershipNFT is ERC721, Ownable {
 
     nextTokenId++;
 }
+
 function isMembershipValid(
     uint256 tokenId
 )
@@ -117,7 +120,8 @@ function getMembership(
         m.endDate
     );
 }
-function withdraw() public {
+
+function withdraw() public onlyOwner {
 
     uint256 balance = address(this).balance;
 
@@ -128,6 +132,7 @@ function withdraw() public {
 
     payable(owner()).transfer(balance);
 }
+
 function getMyMemberships()
     public
     view
@@ -153,6 +158,7 @@ function getMyMemberships()
 
     return ids;
 }
+
 function deactivatePlan(
     uint256 planId
 )
@@ -178,10 +184,12 @@ function getContractBalance()
 {
     return address(this).balance;
 }
+
 function cancelMembership(
     uint256 tokenId
 )
     public
+    onlyOwner
 {
     memberships[tokenId].endDate =
         block.timestamp;
@@ -192,10 +200,12 @@ function extendMembership(
     uint256 extraDays
 )
     public
+    onlyOwner
 {
     memberships[tokenId].endDate +=
         extraDays * 1 days;
 }
+
 function getTotalMemberships()
     public
     view
