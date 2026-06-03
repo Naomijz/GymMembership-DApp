@@ -1,6 +1,6 @@
 import { network } from "hardhat";
 
-const { ethers } = await network.create();
+const { ethers } = await network.connect();
 
 async function main() {
 
@@ -8,8 +8,8 @@ async function main() {
         await ethers.getSigners();
 
     console.log(
-        "Cuenta #19:",
-        await signers[19].getAddress()
+        "Desplegando con cuenta:",
+        await signers[0].getAddress()
     );
 
     const membership =
@@ -19,14 +19,22 @@ async function main() {
 
     await membership.waitForDeployment();
 
+    const address =
+        await membership.getAddress();
+
     console.log(
         "Contrato desplegado en:",
-        await membership.getAddress()
+        address
     );
 
     console.log(
         "Owner:",
         await membership.owner()
+    );
+
+    console.log(
+        "\n✅ Copia esta dirección en MembershipNFTABI.ts:",
+        address
     );
 }
 

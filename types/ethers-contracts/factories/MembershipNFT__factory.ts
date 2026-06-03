@@ -235,19 +235,6 @@ import type { NonPayableOverrides } from "../common.js"
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "planId",
-        "type": "uint256"
-      }
-    ],
-    "name": "activatePlan",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "to",
         "type": "address"
@@ -298,19 +285,6 @@ import type { NonPayableOverrides } from "../common.js"
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "cancelMembership",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "string",
         "name": "_name",
         "type": "string"
@@ -335,37 +309,6 @@ import type { NonPayableOverrides } from "../common.js"
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "planId",
-        "type": "uint256"
-      }
-    ],
-    "name": "deactivatePlan",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "extraDays",
-        "type": "uint256"
-      }
-    ],
-    "name": "extendMembership",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
       }
@@ -376,19 +319,6 @@ import type { NonPayableOverrides } from "../common.js"
         "internalType": "address",
         "name": "",
         "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getContractBalance",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -431,19 +361,6 @@ import type { NonPayableOverrides } from "../common.js"
         "internalType": "uint256[]",
         "name": "",
         "type": "uint256[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getTotalMemberships",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
