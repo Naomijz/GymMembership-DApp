@@ -95,7 +95,7 @@
 
       <div class="stat-item">
         <span class="stat-value">{{ contractBalance }}</span>
-        <span class="stat-label">Wei en contrato</span>
+        <span class="stat-label">SepoliaETH en contrato</span>
       </div>
 
       <div class="stat-item">
@@ -152,10 +152,10 @@
       </div>
 
       <div class="form-group">
-        <label>Precio en Wei</label>
+        <label>Precio en ETH</label>
         <input
           type="text"
-          placeholder="Ej: 1000000000000000 (0.001 ETH)"
+          placeholder="Ej: 0.001"
           [(ngModel)]="newPlanPrice"
         >
       </div>
@@ -182,7 +182,7 @@
           <h3>{{ plan.name }}</h3>
           <div class="plan-meta">
             <span class="plan-badge">📅 {{ plan.durationDays }} días</span>
-            <span class="plan-badge price">⚡ {{ plan.price }} Wei</span>
+            <span class="plan-badge price">⚡ {{ planPriceEth(plan.price) }} ETH</span>
             <span class="plan-badge">{{ plan.active ? '✅ Activo' : '❌ Inactivo' }}</span>
           </div>
         </div>
@@ -315,7 +315,7 @@
           <h3>{{ plan.name }}</h3>
           <div class="plan-meta">
             <span class="plan-badge">📅 {{ plan.durationDays }} días</span>
-            <span class="plan-badge price">⚡ {{ plan.price }} Wei</span>
+            <span class="plan-badge price">⚡ {{ planPriceEth(plan.price) }} ETH</span>
           </div>
         </div>
 

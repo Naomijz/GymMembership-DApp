@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BlockchainService } from './services/blockchain.service';
+import { parseEther, formatEther } from 'ethers';
 
 @Component({
   selector: 'app-root',
@@ -27,7 +28,7 @@ export class App {
 
   newPlanName = '';
   newPlanDuration = 30;
-  newPlanPrice = '';
+  newPlanPrice = ''; // el admin escribe en ETH
 
   currentView = '';
 
@@ -37,6 +38,15 @@ export class App {
   constructor(
     private blockchainService: BlockchainService
   ) {}
+
+  // Convierte Wei a ETH con 6 decimales máximo
+  weiToEth(wei: string): string {
+    try {
+      return parseFloat(formatEther(BigInt(wei))).toFixed(6);
+    } catch {
+      return '0';
+    }
+  }
 
   async connectWallet() {
 
@@ -57,8 +67,9 @@ export class App {
       const balance =
         await this.blockchainService.getContractBalance();
 
+      // Guardamos en ETH para mostrar
       this.contractBalance =
-        balance.toString();
+        this.weiToEth(balance.toString());
 
     } catch (error) {
 
@@ -73,7 +84,7 @@ export class App {
 
       await this.blockchainService.buyMembership(
         plan.id,
-        plan.price
+        plan.price // price sigue en Wei para la transacción
       );
 
       this.memberships =
@@ -83,7 +94,7 @@ export class App {
         await this.blockchainService.getContractBalance();
 
       this.contractBalance =
-        balance.toString();
+        this.weiToEth(balance.toString());
 
       alert('Membresía comprada correctamente');
 
@@ -104,7 +115,7 @@ export class App {
         await this.blockchainService.getContractBalance();
 
       this.contractBalance =
-        balance.toString();
+        this.weiToEth(balance.toString());
 
       alert('Fondos retirados correctamente');
 
@@ -124,10 +135,14 @@ export class App {
 
     try {
 
+      // El admin escribe en ETH, convertimos a Wei para el contrato
+      const priceInWei =
+        parseEther(this.newPlanPrice).toString();
+
       await this.blockchainService.createPlan(
         this.newPlanName,
         this.newPlanDuration,
-        this.newPlanPrice
+        priceInWei
       );
 
       this.plans =
@@ -146,6 +161,11 @@ export class App {
     }
   }
 
+  // Convierte el precio del plan de Wei a ETH para mostrar
+  planPriceEth(priceWei: string): string {
+    return this.weiToEth(priceWei);
+  }
+
   showClient() {
     this.currentView = 'client';
   }
@@ -155,7 +175,6 @@ export class App {
     this.adminError = '';
   }
 
-  // Admin se autentica solo con su wallet — no hay usuario/contraseña
   async loginAdmin() {
 
     try {
@@ -181,7 +200,7 @@ export class App {
         await this.blockchainService.getContractBalance();
 
       this.contractBalance =
-        balance.toString();
+        this.weiToEth(balance.toString());
 
       this.adminLogged = true;
 
