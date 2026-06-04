@@ -32,15 +32,35 @@ export class App {
   editPlanDuration = 30;
   editPlanPrice = '';
 
+  // Búsqueda por wallet (admin)
+  searchWallet = '';
+  searchResults: any[] = [];
+  searchDone = false;
+
+  hasActiveMembership = false;
+
+  // Animación de compra
+  showSuccessAnimation = false;
+
+  // QR
+  qrTokenId: number | null = null;
+  qrDataUrl = '';
+
   constructor(private blockchainService: BlockchainService) {}
+
+  ngOnInit() { document.body.classList.add('home-view'); }
 
   weiToEth(wei: string): string {
     try { return parseFloat(formatEther(BigInt(wei))).toFixed(6); }
     catch { return '0'; }
   }
 
-  planPriceEth(priceWei: string): string {
-    return this.weiToEth(priceWei);
+  planPriceEth(priceWei: string): string { return this.weiToEth(priceWei); }
+
+  // Devuelve el nombre del plan dado su ID
+  getPlanName(planId: number): string {
+    const plan = this.plans.find(p => p.id === planId);
+    return plan ? plan.name : `Plan #${planId}`;
   }
 
   async connectWallet() {
@@ -48,6 +68,7 @@ export class App {
       this.walletAddress = await this.blockchainService.connectWallet();
       this.plans = await this.blockchainService.getPlans();
       this.memberships = await this.blockchainService.getMyMemberships();
+      this.hasActiveMembership = await this.blockchainService.hasActiveMembership(this.walletAddress);
       this.isAdmin = await this.blockchainService.isOwner();
       const balance = await this.blockchainService.getContractBalance();
       this.contractBalance = this.weiToEth(balance.toString());
@@ -55,13 +76,79 @@ export class App {
   }
 
   async buyPlan(plan: any) {
+    if (this.hasActiveMembership) {
+      alert('Ya tienes una membresía activa. Espera a que expire o cancélala para comprar otra.');
+      return;
+    }
     try {
       await this.blockchainService.buyMembership(plan.id, plan.price);
       this.memberships = await this.blockchainService.getMyMemberships();
+      this.hasActiveMembership = await this.blockchainService.hasActiveMembership(this.walletAddress);
       const balance = await this.blockchainService.getContractBalance();
       this.contractBalance = this.weiToEth(balance.toString());
-      alert('Membresía comprada correctamente');
+      this.triggerSuccessAnimation();
     } catch (error) { console.error(error); }
+  }
+
+  // Renovar membresía — el cliente paga el precio del plan original
+  async renewMembership(membership: any) {
+    try {
+      const plan = this.plans.find(p => p.id === membership.planId);
+      if (!plan) { alert('Plan no encontrado'); return; }
+      await this.blockchainService.renewMembership(membership.tokenId, plan.price);
+      this.memberships = await this.blockchainService.getMyMemberships();
+      this.triggerSuccessAnimation();
+    } catch (error) { console.error(error); }
+  }
+
+  // Animación de éxito al comprar o renovar
+  triggerSuccessAnimation() {
+    this.showSuccessAnimation = true;
+    setTimeout(() => { this.showSuccessAnimation = false; }, 3000);
+  }
+
+  // Generar QR del NFT usando API pública
+  async generateQR(tokenId: number) {
+    this.qrTokenId = tokenId;
+    const text = `ChainPass NFT #${tokenId} | Contrato: ${(await this.blockchainService.getContractBalance(), '0xBC9Eec04DdE2d7fde30f2dd961b41ad1bC138227')}`;
+    const url = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(text)}`;
+    this.qrDataUrl = url;
+  }
+
+  closeQR() { this.qrTokenId = null; this.qrDataUrl = ''; }
+
+  searchError = '';
+
+  // Buscar membresías por wallet (admin)
+  async searchByWallet() {
+    if (!this.searchWallet) return;
+    this.searchResults = [];
+    this.searchDone = false;
+    this.searchError = '';
+    try {
+      const total = await this.blockchainService.getTotalMemberships();
+      for (let i = 0; i < Number(total); i++) {
+        try {
+          const owner = await this.blockchainService.getMembershipOwner(i);
+          if (owner.toLowerCase() === this.searchWallet.toLowerCase()) {
+            const membership = await this.blockchainService.contract.getMembership(i);
+            const valid = await this.blockchainService.contract.isMembershipValid(i);
+            this.searchResults.push({
+              tokenId: i,
+              planId: Number(membership[0]),
+              startDate: Number(membership[1]),
+              endDate: Number(membership[2]),
+              valid,
+              owner
+            });
+          }
+        } catch { /* token eliminado o inaccesible, se omite */ }
+      }
+    } catch (error) {
+      console.error(error);
+      this.searchError = 'Error al consultar el contrato. Verifica la conexión.';
+    }
+    this.searchDone = true;
   }
 
   async withdrawFunds() {
@@ -79,14 +166,11 @@ export class App {
       const priceInWei = parseEther(this.newPlanPrice).toString();
       await this.blockchainService.createPlan(this.newPlanName, this.newPlanDuration, priceInWei);
       this.plans = await this.blockchainService.getPlans();
-      this.newPlanName = '';
-      this.newPlanDuration = 30;
-      this.newPlanPrice = '';
+      this.newPlanName = ''; this.newPlanDuration = 30; this.newPlanPrice = '';
       alert('Plan creado correctamente');
     } catch (error) { console.error(error); }
   }
 
-  // Abre el formulario de edición con los datos actuales del plan
   startEditPlan(plan: any) {
     this.editingPlan = plan;
     this.editPlanName = plan.name;
@@ -94,19 +178,12 @@ export class App {
     this.editPlanPrice = this.weiToEth(plan.price);
   }
 
-  cancelEditPlan() {
-    this.editingPlan = null;
-  }
+  cancelEditPlan() { this.editingPlan = null; }
 
   async saveEditPlan() {
     try {
       const priceInWei = parseEther(this.editPlanPrice).toString();
-      await this.blockchainService.editPlan(
-        this.editingPlan.id,
-        this.editPlanName,
-        this.editPlanDuration,
-        priceInWei
-      );
+      await this.blockchainService.editPlan(this.editingPlan.id, this.editPlanName, this.editPlanDuration, priceInWei);
       this.plans = await this.blockchainService.getPlans();
       this.editingPlan = null;
       alert('Plan actualizado correctamente');
@@ -122,8 +199,10 @@ export class App {
     } catch (error) { console.error(error); }
   }
 
-  showClient() { this.currentView = 'client'; }
-  showAdmin() { this.currentView = 'admin'; this.adminError = ''; }
+  showClient() { this.currentView = 'client'; document.body.classList.remove('home-view'); }
+
+  goHome() { this.currentView = ''; document.body.classList.add('home-view'); }
+  showAdmin() { this.currentView = 'admin'; this.adminError = ''; document.body.classList.remove('home-view'); }
 
   async loginAdmin() {
     try {
@@ -146,12 +225,14 @@ export class App {
       for (let i = 0; i < Number(total); i++) {
         const membership = await this.blockchainService.contract.getMembership(i);
         const valid = await this.blockchainService.contract.isMembershipValid(i);
+        const owner = await this.blockchainService.getMembershipOwner(i);
         this.allMemberships.push({
           tokenId: i,
           planId: Number(membership[0]),
           startDate: Number(membership[1]),
           endDate: Number(membership[2]),
-          valid
+          valid,
+          owner
         });
       }
     } catch (error) { console.error(error); }
@@ -161,6 +242,9 @@ export class App {
     try {
       await this.blockchainService.cancelMembership(tokenId);
       await this.loadAllMemberships();
+      if (this.walletAddress) {
+        this.hasActiveMembership = await this.blockchainService.hasActiveMembership(this.walletAddress);
+      }
       alert('Membresía cancelada');
     } catch (error) { console.error(error); }
   }

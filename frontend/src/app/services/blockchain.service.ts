@@ -14,9 +14,7 @@ export class BlockchainService {
 
   async connectWallet(): Promise<string> {
     if (!window.ethereum) throw new Error('MetaMask no instalado');
-
     this.provider = new BrowserProvider(window.ethereum);
-
     const network = await this.provider.getNetwork();
     if (network.chainId !== 11155111n) {
       try {
@@ -24,8 +22,7 @@ export class BlockchainService {
       } catch (switchError: any) {
         if (switchError.code === 4902) {
           await this.provider.send('wallet_addEthereumChain', [{
-            chainId: '0xaa36a7',
-            chainName: 'Sepolia Testnet',
+            chainId: '0xaa36a7', chainName: 'Sepolia Testnet',
             nativeCurrency: { name: 'SepoliaETH', symbol: 'ETH', decimals: 18 },
             rpcUrls: ['https://sepolia.infura.io/v3/'],
             blockExplorerUrls: ['https://sepolia.etherscan.io']
@@ -34,7 +31,6 @@ export class BlockchainService {
       }
       this.provider = new BrowserProvider(window.ethereum);
     }
-
     await this.provider.send('eth_requestAccounts', []);
     const signer = await this.provider.getSigner();
     this.contract = new Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
@@ -47,13 +43,7 @@ export class BlockchainService {
     for (let i = 0; i < Number(totalPlans); i++) {
       const plan = await this.contract.plans(i);
       if (plan.name !== '') {
-        plans.push({
-          id: i,
-          name: plan.name,
-          durationDays: Number(plan.durationDays),
-          price: plan.price.toString(),
-          active: plan.active
-        });
+        plans.push({ id: i, name: plan.name, durationDays: Number(plan.durationDays), price: plan.price.toString(), active: plan.active });
       }
     }
     return plans;
@@ -61,6 +51,11 @@ export class BlockchainService {
 
   async buyMembership(planId: number, priceWei: string) {
     const tx = await this.contract.buyMembership(planId, { value: priceWei });
+    await tx.wait();
+  }
+
+  async renewMembership(tokenId: number, priceWei: string) {
+    const tx = await this.contract.renewMembership(tokenId, { value: priceWei });
     await tx.wait();
   }
 
@@ -81,6 +76,10 @@ export class BlockchainService {
     return memberships;
   }
 
+  async getMembershipOwner(tokenId: number): Promise<string> {
+    return await this.contract.getMembershipOwner(tokenId);
+  }
+
   async isOwner() {
     const signer = await this.provider.getSigner();
     const currentAddress = await signer.getAddress();
@@ -88,41 +87,29 @@ export class BlockchainService {
     return currentAddress.toLowerCase() === owner.toLowerCase();
   }
 
-  async getContractBalance() {
-    return await this.provider.getBalance(CONTRACT_ADDRESS);
-  }
+  async getContractBalance() { return await this.provider.getBalance(CONTRACT_ADDRESS); }
 
-  async withdrawFunds() {
-    const tx = await this.contract.withdraw();
-    await tx.wait();
-  }
+  async withdrawFunds() { const tx = await this.contract.withdraw(); await tx.wait(); }
 
   async createPlan(name: string, durationDays: number, priceWei: string) {
-    const tx = await this.contract.createPlan(name, durationDays, priceWei);
-    await tx.wait();
+    const tx = await this.contract.createPlan(name, durationDays, priceWei); await tx.wait();
   }
 
   async editPlan(planId: number, name: string, durationDays: number, priceWei: string) {
-    const tx = await this.contract.editPlan(planId, name, durationDays, priceWei);
-    await tx.wait();
+    const tx = await this.contract.editPlan(planId, name, durationDays, priceWei); await tx.wait();
   }
 
-  async deletePlan(planId: number) {
-    const tx = await this.contract.deletePlan(planId);
-    await tx.wait();
-  }
+  async deletePlan(planId: number) { const tx = await this.contract.deletePlan(planId); await tx.wait(); }
 
-  async cancelMembership(tokenId: number) {
-    const tx = await this.contract.cancelMembership(tokenId);
-    await tx.wait();
-  }
+  async cancelMembership(tokenId: number) { const tx = await this.contract.cancelMembership(tokenId); await tx.wait(); }
 
   async extendMembership(tokenId: number, days: number) {
-    const tx = await this.contract.extendMembership(tokenId, days);
-    await tx.wait();
+    const tx = await this.contract.extendMembership(tokenId, days); await tx.wait();
   }
 
-  async getTotalMemberships() {
-    return await this.contract.getTotalMemberships();
+  async getTotalMemberships() { return await this.contract.getTotalMemberships(); }
+
+  async hasActiveMembership(address: string): Promise<boolean> {
+    return await this.contract.hasActiveMembership(address);
   }
 }
